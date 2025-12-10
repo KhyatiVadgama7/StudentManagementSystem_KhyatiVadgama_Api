@@ -18,6 +18,9 @@ namespace StudentManagementSystem_KhyatiVadgama_Infrastructure.Data
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken ct = default) => await _db.SaveChangesAsync(ct);
+
+        public ApplicationDbContext Context => _db;
+
         public void Dispose() => _db.Dispose();
     }
 }

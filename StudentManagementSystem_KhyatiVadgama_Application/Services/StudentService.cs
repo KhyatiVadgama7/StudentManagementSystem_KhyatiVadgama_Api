@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace StudentManagementSystem_KhyatiVadgama_Application.Services
 {
-    public class StudentService
+    public class StudentService : IStudentService
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
@@ -37,8 +37,11 @@ namespace StudentManagementSystem_KhyatiVadgama_Application.Services
             }
 
             var skip = (page - 1) * pageSize;
-            var list = await _uow.Students.ListAsync(filter, orderBy, skip, pageSize);
-            var total = (await _uow.Students.ListAsync(filter)).Count();
+            var list = await _uow.Students.ListAsync(
+                filter, orderBy, skip, pageSize,
+                s => s.StudentClasses
+            );
+            var total = (await _uow.Students.ListAsync(filter, null, null, null, s => s.StudentClasses)).Count();
             var dtos = list.Select(s =>
             {
                 return new StudentDto()
@@ -107,7 +110,7 @@ namespace StudentManagementSystem_KhyatiVadgama_Application.Services
             };
         }
 
-        public async Task<bool> UpdateAsync(Guid id, CreateStudentRequest req)
+        public async Task<bool> UpdateAsync(Guid id, UpdateStudentRequest req)
         {
             var student = await _uow.Students.GetByIdAsync(id);
             if (student == null) return false;

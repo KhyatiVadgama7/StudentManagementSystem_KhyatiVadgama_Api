@@ -18,17 +18,28 @@ namespace StudentManagementSystem_KhyatiVadgama_Infrastructure.Data
             return await _db.FindAsync<TEntity>(new object[] { id }, ct);
         }
 
-        public async Task<IEnumerable<TEntity>> ListAsync(Expression<Func<TEntity, bool>>? filter = null,
-                                                         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-                                                         int? skip = null, int? take = null, CancellationToken ct = default)
+        public async Task<IEnumerable<TEntity>> ListAsync(Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, int? skip = null, int? take = null, params Expression<Func<TEntity, object>>[] includes)
         {
-            IQueryable<TEntity> q = _db.Set<TEntity>();
-            if (filter != null) q = q.Where(filter);
-            if (orderBy != null) q = orderBy(q);
-            if (skip.HasValue) q = q.Skip(skip.Value);
-            if (take.HasValue) q = q.Take(take.Value);
-            return await q.AsNoTracking().ToListAsync(ct);
+            IQueryable<TEntity> query = _db.Set<TEntity>();
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            foreach (var include in includes)
+                query = query.Include(include);
+
+            if (orderBy != null)
+                query = orderBy(query);
+
+            if (skip.HasValue)
+                query = query.Skip(skip.Value);
+
+            if (take.HasValue)
+                query = query.Take(take.Value);
+
+            return await query.ToListAsync();
         }
+
 
         public async Task AddAsync(TEntity entity, CancellationToken ct = default) => await _db.Set<TEntity>().AddAsync(entity, ct);
 
