@@ -1,0 +1,6 @@
+@StudentManagementSystem_KhyatiVadgama_Api_HostAddress = http://localhost:5216
+
+GET {{StudentManagementSystem_KhyatiVadgama_Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
